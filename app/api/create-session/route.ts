@@ -17,6 +17,25 @@ const DEFAULT_CHATKIT_BASE = "https://api.openai.com";
 const SESSION_COOKIE_NAME = "chatkit_session_id";
 const SESSION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
+// ⚠️ PON AQUÍ EL ORIGEN DE TU DASHBOARD (Flask). SIN barra final.
+//   Ejemplos:
+//   const ALLOW_ORIGIN = "http://127.0.0.1:5000";
+//   const ALLOW_ORIGIN = "https://tu-dominio.com";
+const ALLOW_ORIGIN = "http://127.0.0.1:5000";
+
+const corsHeaders: Record<string, string> = {
+  "Access-Control-Allow-Origin": ALLOW_ORIGIN,
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  // (opcional) ayuda a caches/proxies a variar por origen
+  "Vary": "Origin",
+};
+
+export async function OPTIONS(): Promise<Response> {
+  return new Response(null, { headers: corsHeaders });
+}
+
 export async function POST(request: Request): Promise<Response> {
   if (request.method !== "POST") {
     return methodNotAllowedResponse();
@@ -25,14 +44,11 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const openaiApiKey = process.env.OPENAI_API_KEY;
     if (!openaiApiKey) {
-      return new Response(
-        JSON.stringify({
-          error: "Missing OPENAI_API_KEY environment variable",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+      return buildJsonResponse(
+        { error: "Missing OPENAI_API_KEY environment variable" },
+        500,
+        { "Content-Type": "application/json" },
+        sessionCookie
       );
     }
 
@@ -111,8 +127,8 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    const clientSecret = upstreamJson?.client_secret ?? null;
-    const expiresAfter = upstreamJson?.expires_after ?? null;
+    const clientSecret = (upstreamJson as any)?.client_secret ?? null;
+    const expiresAfter = (upstreamJson as any)?.expires_after ?? null;
     const responsePayload = {
       client_secret: clientSecret,
       expires_after: expiresAfter,
@@ -140,9 +156,10 @@ export async function GET(): Promise<Response> {
 }
 
 function methodNotAllowedResponse(): Response {
+  // ⬇️ Incluimos CORS aquí también
   return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
     status: 405,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...corsHeaders },
   });
 }
 
@@ -211,7 +228,8 @@ function buildJsonResponse(
   headers: Record<string, string>,
   sessionCookie: string | null
 ): Response {
-  const responseHeaders = new Headers(headers);
+  // ⬇️ SIEMPRE agregamos CORS a cualquier respuesta JSON
+  const responseHeaders = new Headers({ ...headers, ...corsHeaders });
 
   if (sessionCookie) {
     responseHeaders.append("Set-Cookie", sessionCookie);
