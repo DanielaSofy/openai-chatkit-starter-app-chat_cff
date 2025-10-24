@@ -9,7 +9,7 @@ import {
   getThemeConfig,
 } from "@/lib/config";
 
-export default function Home() {
+export default function App() {
   const elRef = useRef<any>(null);
 
   useEffect(() => {
@@ -18,12 +18,13 @@ export default function Home() {
       if (!el) return;
 
       el.setOptions({
-        // 👇 Tu personalización desde lib/config.ts
+        // 👇 usa tus textos desde lib/config.ts
         startScreen: { greeting: GREETING, prompts: STARTER_PROMPTS },
         placeholder: PLACEHOLDER_INPUT,
-        theme: getThemeConfig("light"), // usa "dark" si prefieres tema oscuro
+        // "light" o "dark"
+        theme: getThemeConfig("light"),
 
-        // 👇 Endpoint del starter (no cambiar)
+        // 👇 endpoint del starter (no cambiar)
         api: {
           async getClientSecret() {
             const res = await fetch(CREATE_SESSION_ENDPOINT, {
