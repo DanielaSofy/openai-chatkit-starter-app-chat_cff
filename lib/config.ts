@@ -4,9 +4,9 @@ export const WORKFLOW_ID =
   process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID?.trim() ?? "";
 export const CREATE_SESSION_ENDPOINT = "/api/create-session";
 export const STARTER_PROMPTS: StartScreenPrompt[] = [
-  { label: "Redactar escrito al SAT", prompt: "Ayúdame a redactar un escrito al SAT solicitando la línea de captura para regularizarme dentro de un acuerdo conclusivo. Tono formal y estructura jurídica.", icon: "pencil" },
-  { label: "Recursos y plazos", prompt: "¿Cuáles son los plazos y requisitos para interponer un recurso de revocación ante el SAT en México? Responde claro y con fundamento.", icon: "book" },
-  { label: "Mejorar redacción", prompt: "Mejora este texto con estilo técnico, formal y breve: ", icon: "sparkles" },
+  { label: "Redactar escrito al SAT", prompt: "Ayúdame a redactar un escrito al SAT solicitando la línea de captura para regularizarme dentro de un acuerdo conclusivo. Tono formal y estructura jurídica." },
+  { label: "Recursos y plazos", prompt: "¿Cuáles son los plazos y requisitos para interponer un recurso de revocación ante el SAT en México? Responde claro y con fundamento." },
+  { label: "Mejorar redacción", prompt: "Mejora este texto con estilo técnico, formal y breve: " },
 ];
 export const PLACEHOLDER_INPUT = "Ask anything...";
 export const GREETING = "How can I help you today?";
