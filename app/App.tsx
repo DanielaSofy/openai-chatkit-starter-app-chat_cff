@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Script from "next/script";
 import {
   CREATE_SESSION_ENDPOINT,
   STARTER_PROMPTS,
@@ -9,7 +10,7 @@ import {
   getThemeConfig,
 } from "@/lib/config";
 
-export default function App() {
+export default function Home() {
   const elRef = useRef<any>(null);
 
   useEffect(() => {
@@ -18,13 +19,9 @@ export default function App() {
       if (!el) return;
 
       el.setOptions({
-        // 👇 usa tus textos desde lib/config.ts
         startScreen: { greeting: GREETING, prompts: STARTER_PROMPTS },
         placeholder: PLACEHOLDER_INPUT,
-        // "light" o "dark"
         theme: getThemeConfig("light"),
-
-        // 👇 endpoint del starter (no cambiar)
         api: {
           async getClientSecret() {
             const res = await fetch(CREATE_SESSION_ENDPOINT, {
@@ -41,6 +38,10 @@ export default function App() {
 
   return (
     <main style={{ height: "100vh", width: "100%" }}>
+      <Script
+        src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
+        strategy="afterInteractive"
+      />
       <openai-chatkit ref={elRef} style={{ display: "block", height: "100%" }} />
     </main>
   );
