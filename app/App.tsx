@@ -1,3 +1,4 @@
+// app/page.tsx
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -15,10 +16,11 @@ export default function Home() {
 
   useEffect(() => {
     customElements.whenDefined("openai-chatkit").then(() => {
-      const el = elRef.current as any;
-      if (!el) return;
+      const chat = elRef.current as any;
+      if (!chat) return;
 
-      el.setOptions({
+      chat.setOptions({
+        locale: "es", // ← sin esto el UI queda en inglés
         startScreen: { greeting: GREETING, prompts: STARTER_PROMPTS },
         placeholder: PLACEHOLDER_INPUT,
         theme: getThemeConfig("light"),
@@ -46,3 +48,4 @@ export default function Home() {
     </main>
   );
 }
+
