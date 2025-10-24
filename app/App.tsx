@@ -1,34 +1,46 @@
 "use client";
 
-import { useCallback } from "react";
-import { ChatKitPanel, type FactAction } from "@/components/ChatKitPanel";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useEffect, useRef } from "react";
+import {
+  CREATE_SESSION_ENDPOINT,
+  STARTER_PROMPTS,
+  PLACEHOLDER_INPUT,
+  GREETING,
+  getThemeConfig,
+} from "@/lib/config";
 
-export default function App() {
-  const { scheme, setScheme } = useColorScheme();
+export default function Home() {
+  const elRef = useRef<any>(null);
 
-  const handleWidgetAction = useCallback(async (action: FactAction) => {
-    if (process.env.NODE_ENV !== "production") {
-      console.info("[ChatKitPanel] widget action", action);
-    }
-  }, []);
+  useEffect(() => {
+    customElements.whenDefined("openai-chatkit").then(() => {
+      const el = elRef.current as any;
+      if (!el) return;
 
-  const handleResponseEnd = useCallback(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.debug("[ChatKitPanel] response end");
-    }
+      el.setOptions({
+        // 👇 Tu personalización desde lib/config.ts
+        startScreen: { greeting: GREETING, prompts: STARTER_PROMPTS },
+        placeholder: PLACEHOLDER_INPUT,
+        theme: getThemeConfig("light"), // usa "dark" si prefieres tema oscuro
+
+        // 👇 Endpoint del starter (no cambiar)
+        api: {
+          async getClientSecret() {
+            const res = await fetch(CREATE_SESSION_ENDPOINT, {
+              method: "POST",
+              credentials: "include",
+            });
+            const { client_secret } = await res.json();
+            return client_secret;
+          },
+        },
+      });
+    });
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-end bg-slate-100 dark:bg-slate-950">
-      <div className="mx-auto w-full max-w-5xl">
-        <ChatKitPanel
-          theme={scheme}
-          onWidgetAction={handleWidgetAction}
-          onResponseEnd={handleResponseEnd}
-          onThemeRequest={setScheme}
-        />
-      </div>
+    <main style={{ height: "100vh", width: "100%" }}>
+      <openai-chatkit ref={elRef} style={{ display: "block", height: "100%" }} />
     </main>
   );
 }
